@@ -1,0 +1,171 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script type="text/javascript" th:src="@{/sure.js}"></script>
+  <title>Employee Directory</title>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-sm navbar-light bg-success">
+      <div class="container-fluid ">
+        <a class="navbar-brand" th:href="@{/employees/HomePage}" href="#">Homepage</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+          <ul class="navbar-nav ">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" th:href="@{/logout}">Logout</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+  <div class="container">
+      <h3>Employee Directory</h3>
+<!--      <form th:action="@{/logout}" method="post">-->
+<!--        <input type="submit" value="logout">-->
+<!--      </form>-->
+
+      <hr>
+      <a th:href="@{/employees/addForm}" class="btn btn-primary btn-sm mb-3" >Add Employee</a>
+
+      <form action='#' th:action="@{/employees/search}" th:object="${textSearch}"
+            method="post">
+        <div class="input-group">
+          <input type="search" th:field="*{searchText}" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+          <button type="submit" value="search" class="btn btn-outline-primary">search</button>
+        </div>
+      </form>
+
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+        <tr>
+          <th>
+            <a th:href="@{'/employees/page/' + ${currentPage}(sortBy=firstName,textS=${searchText})}" style="color:white">First Name</a>
+          </th>
+          <th>
+            <a  th:href="@{'/employees/page/' + ${currentPage}(sortBy=lastName,textS=${searchText})}" style="color:white">Last Name</a>
+          </th>
+
+          <th>Email</th>
+          <th>Update</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="tempEmployee : ${employees}">
+
+          <td style="color:red;" th:text="${tempEmployee.firstName}" />
+          <td style="color:red;" th:text="${tempEmployee.lastName}" />
+          <td th:text="${tempEmployee.email}" />
+          <td>
+            <a type="submit" th:href="@{/employees/updateForm(empId=${tempEmployee.id})}" class="btn btn-primary" >Update</a>
+            <a type="submit" th:href="@{/employees/deleteForm(empId=${tempEmployee.id})}" class="btn btn-danger" th:onclick="if(!confirm('Are you sure')) return false">Delete</a>
+          </td>
+
+
+        </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+    <!--Page option 2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
+    <div th:if="${totalPages > 1}">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item">
+                    <a class="page-link" th:if="${currentPage > 1}" th:href="@{/employees/page/1(sortBy=${sortText},textS=${searchText})}">First</a>
+                    <span class="page-link" th:unless="${currentPage > 1}">First</span>
+                </li>
+                <li class="page-item">
+                    <a  class="page-link" th:if="${currentPage > 1}" th:href="@{'/employees/page/' + ${currentPage - 1}(sortBy=${sortText},textS=${searchText})}">Previous</a>
+                    <span class="page-link" th:unless="${currentPage > 1}">Previous</span>
+                </li>
+
+                <span th:each="pageNo: ${#numbers.sequence(currentPage-3, currentPage+3)}">
+                    <li class="page-item">
+                        <a  class="page-link" th:if="${currentPage != pageNo AND pageNo >= 1 AND pageNo <= totalPages}" th:href="@{'/employees/page/' + ${pageNo}(sortBy=${sortText},textS=${searchText})}">[[${pageNo}]]</a>
+                        <span class="page-link" th:if="${currentPage == pageNo}">[[${pageNo}]]</span>
+
+                    </li>
+                </span>
+
+                <li class="page-item">
+                    <a class="page-link" th:if="${currentPage < totalPages}" th:href="@{'/employees/page/' + ${currentPage + 1}(sortBy=${sortText},textS=${searchText})}">Next</a>
+                    <span class="page-link" th:unless="${currentPage < totalPages}">Next</span>
+                </li>
+
+                <li class="page-item">
+                    <a class="page-link" th:if="${currentPage < totalPages}" th:href="@{'/employees/page/' + ${totalPages}(sortBy=${sortText},textS=${searchText})}">Last</a>
+                    <span class="page-link" th:unless="${currentPage < totalPages}">Last</span>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+    <!--Page option 2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
+<!--    <div th:if="${totalPages > 1}">-->
+<!--      <div class="row col-sm-10">-->
+<!--        <div class="col-sm-2">-->
+<!--          Total Rows: [[${totalPages}]]-->
+<!--        </div>-->
+<!--        <div class="col-sm-1">-->
+<!--          <a th:if="${currentPage > 1}" th:href="@{/employees/page/1(sortBy=${sortText},textS=${searchText})}">First</a>-->
+<!--          <span th:unless="${currentPage > 1}">First</span>-->
+<!--        </div>-->
+
+<!--        <div class="col-sm-1">-->
+<!--          <a th:if="${currentPage > 1}" th:href="@{'/employees/page/' + ${currentPage - 1}(sortBy=${sortText},textS=${searchText})}">Previous</a>-->
+<!--          <span th:unless="${currentPage > 1}">Previous</span>-->
+<!--        </div>-->
+
+<!--        <div class="col-sm-1">-->
+<!--          <span th:each="pageNo: ${#numbers.sequence(currentPage-3, currentPage+3)}">-->
+<!--&lt;!&ndash;              <a th:if="${currentPage != pageNo }" th:href="@{'/employees/page/' + ${pageNo}(sortBy=${sortText},textS=${searchText})}">[[${pageNo}]]</a>&ndash;&gt;-->
+<!--&lt;!&ndash;              <span th:unless="${currentPage != pageNo}">[[${pageNo}]]</span> &nbsp; &nbsp;&ndash;&gt;-->
+<!--              <a th:if="${currentPage != pageNo AND pageNo >= 1 AND pageNo <= totalPages}" th:href="@{'/employees/page/' + ${pageNo}(sortBy=${sortText},textS=${searchText})}">[[${pageNo}]]</a>-->
+<!--              <span  th:if="${currentPage == pageNo}">[[${pageNo}]]</span>-->
+<!--          </span>-->
+<!--        </div>-->
+
+<!--        <div class="col-sm-1">-->
+<!--            <a th:if="${currentPage < totalPages}" th:href="@{'/employees/page/' + ${currentPage + 1}(sortBy=${sortText},textS=${searchText})}">Next</a>-->
+<!--            <span th:unless="${currentPage < totalPages}">Next</span>-->
+<!--        </div>-->
+
+<!--        <div class="col-sm-1">-->
+<!--            <a th:if="${currentPage < totalPages}" th:href="@{'/employees/page/' + ${totalPages}(sortBy=${sortText},textS=${searchText})}">Last</a>-->
+<!--            <span th:unless="${currentPage < totalPages}">Last</span>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
